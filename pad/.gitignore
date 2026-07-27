@@ -1,0 +1,15 @@
+﻿# Binaries
+*.test
+*.exe
+*.wasm
+bin/
+
+# Dependencies
+vendor/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
