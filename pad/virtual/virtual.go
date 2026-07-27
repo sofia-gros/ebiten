@@ -1,22 +1,22 @@
-﻿package virtual
+package virtual
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// VirtualComponent 縺ｯ繝舌・繝√Ε繝ｫ UI 繧ｳ繝ｳ繝昴・繝阪Φ繝医・蜈ｱ騾壹う繝ｳ繧ｿ繝ｼ繝輔ぉ繝ｼ繧ｹ縺ｧ縺吶・
+// VirtualComponent はバーチャル UI コンポーネントの共通インターフェースです。
 type VirtualComponent interface {
 	Update(touches []ebiten.TouchID)
 	Draw(screen *ebiten.Image)
 }
 
-// VirtualPad 縺ｯ繝舌・繝√Ε繝ｫ繧ｹ繝・ぅ繝・け縺ｨ繝懊ち繝ｳ縺ｮ髮・粋繧堤ｮ｡逅・＠縺ｾ縺吶・
+// VirtualPad はバーチャルスティックとボタンの集合を管理します。
 type VirtualPad struct {
 	buttons []*Button
 	sticks  []*Stick
 }
 
-// NewVirtualPad 縺ｯ譁ｰ縺励＞ VirtualPad 繧剃ｽ懈・縺励∪縺吶・
+// NewVirtualPad は新しい VirtualPad を作成します。
 func NewVirtualPad() *VirtualPad {
 	return &VirtualPad{
 		buttons: []*Button{},
@@ -24,21 +24,21 @@ func NewVirtualPad() *VirtualPad {
 	}
 }
 
-// AddButton 縺ｯ譁ｰ縺励＞繝懊ち繝ｳ繧定ｿｽ蜉縺励※霑斐＠縺ｾ縺吶・
+// AddButton は新しいボタンを追加して返します。
 func (v *VirtualPad) AddButton() *Button {
 	b := &Button{}
 	v.buttons = append(v.buttons, b)
 	return b
 }
 
-// AddStick 縺ｯ譁ｰ縺励＞繧ｹ繝・ぅ繝・け繧定ｿｽ蜉縺励※霑斐＠縺ｾ縺吶・
+// AddStick は新しいスティックを追加して返します。
 func (v *VirtualPad) AddStick() *Stick {
 	s := &Stick{}
 	v.sticks = append(v.sticks, s)
 	return s
 }
 
-// Update 縺ｯ縺吶∋縺ｦ縺ｮ繧ｳ繝ｳ繝昴・繝阪Φ繝医・迥ｶ諷九ｒ譖ｴ譁ｰ縺励∪縺吶・
+// Update はすべてのコンポーネントの状態を更新します。
 func (v *VirtualPad) Update() {
 	touchIDs := ebiten.AppendTouchIDs(nil)
 	
@@ -50,7 +50,7 @@ func (v *VirtualPad) Update() {
 	}
 }
 
-// Draw 縺ｯ縺吶∋縺ｦ縺ｮ繧ｳ繝ｳ繝昴・繝阪Φ繝医ｒ謠冗判縺励∪縺吶・
+// Draw はすべてのコンポーネントを描画します。
 func (v *VirtualPad) Draw(screen *ebiten.Image) {
 	for _, b := range v.buttons {
 		b.Draw(screen)

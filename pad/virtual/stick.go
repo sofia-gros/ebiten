@@ -1,4 +1,4 @@
-﻿package virtual
+package virtual
 
 import (
 	"image/color"
@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-// Stick 縺ｯ繝舌・繝√Ε繝ｫ繧｢繝翫Ο繧ｰ繧ｹ繝・ぅ繝・け繧定｡ｨ縺励∪縺吶・
+// Stick はバーチャルアナログスティックを表します。
 type Stick struct {
 	x, y   float64
 	radius float64
@@ -21,38 +21,38 @@ type Stick struct {
 	mouseLocked bool
 }
 
-// SetPosition 縺ｯ繧ｹ繝・ぅ繝・け縺ｮ荳ｭ蠢・ｽ咲ｽｮ繧定ｨｭ螳壹＠縺ｾ縺吶・
+// SetPosition はスティックの中心位置を設定します。
 func (s *Stick) SetPosition(x, y float64) *Stick {
 	s.x, s.y = x, y
 	return s
 }
 
-// SetRadius 縺ｯ繧ｹ繝・ぅ繝・け縺ｮ遞ｼ蜒榊濠蠕・ｒ險ｭ螳壹＠縺ｾ縺吶・
+// SetRadius はスティックの稼働半径を設定します。
 func (s *Stick) SetRadius(r float64) *Stick {
 	s.radius = r
 	return s
 }
 
-// Vector 縺ｯ迴ｾ蝨ｨ縺ｮ蜈･蜉帙・繧ｯ繝医Ν (-1.0 ~ 1.0) 繧定ｿ斐＠縺ｾ縺吶・
+// Vector は現在の入力ベクトル (-1.0 ~ 1.0) を返します。
 func (s *Stick) Vector() (x, y float64) {
 	return s.inputX, s.inputY
 }
 
-// Strength 縺ｯ蜈･蜉帙・蠑ｷ縺・(0.0 ~ 1.0) 繧定ｿ斐＠縺ｾ縺吶・
+// Strength は入力の強さ (0.0 ~ 1.0) を返します。
 func (s *Stick) Strength() float64 {
 	return s.strength
 }
 
-// Update 縺ｯ繧ｹ繝・ぅ繝・け縺ｮ迥ｶ諷九ｒ譖ｴ譁ｰ縺励∪縺吶・
+// Update はスティックの状態を更新します。
 func (s *Stick) Update(touches []ebiten.TouchID) {
-	// 繝ｭ繝・け荳ｭ縺ｧ縺ｪ縺代ｌ縺ｰ豈・ヵ繝ｬ繝ｼ繝縺ｮ迥ｶ諷九ｒ繝ｪ繧ｻ繝・ヨ
+	// ロック中でなければ毅フレームの状態をリセット
 	if !s.touchLocked && !s.mouseLocked {
 		s.inputX = 0
 		s.inputY = 0
 		s.strength = 0
 	}
 
-	// 繧ｿ繝・メ蜈･蜉帛・逅・
+	// タッチ入力処理
 	if s.touchLocked {
 		found := false
 		for _, id := range touches {
@@ -70,25 +70,25 @@ func (s *Stick) Update(touches []ebiten.TouchID) {
 			s.strength = 0
 		}
 	} else {
-		// 譁ｰ縺励＞繧ｿ繝・メ
+		// 新しいタッチ
 		for _, id := range touches {
 			tx, ty := ebiten.TouchPosition(id)
 			if s.isInside(float64(tx), float64(ty)) {
 				s.touchID = id
 				s.touchLocked = true
-				s.mouseLocked = false // 繧ｿ繝・メ縺悟━蜈・
+				s.mouseLocked = false // タッチが優先
 				s.updateInput(float64(tx), float64(ty))
 				break
 			}
 		}
 	}
 
-	// 繧ｿ繝・メ縺ｫ繝ｭ繝・け縺輔ｌ縺ｦ縺・ｋ蝣ｴ蜷医・繝槭え繧ｹ蜈･蜉帙ｒ辟｡隕・
+	// タッチにロックされている場合はマウス入力を無視
 	if s.touchLocked {
 		return
 	}
 
-	// 繝槭え繧ｹ蜈･蜉幢ｼ医ラ繝ｩ繝・げ縺ｧ繝ｭ繝・け・・
+	// マウス入力（ドラッグでロック）
 	if s.mouseLocked {
 		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 			s.mouseLocked = false
@@ -113,7 +113,7 @@ func (s *Stick) Update(touches []ebiten.TouchID) {
 func (s *Stick) isInside(x, y float64) bool {
 	dx := x - s.x
 	dy := y - s.y
-	return math.Sqrt(dx*dx+dy*dy) <= s.radius*1.5 // 驕翫・繧呈戟縺溘○繧・
+	return math.Sqrt(dx*dx+dy*dy) <= s.radius*1.5 // 遊びを持たせる
 }
 
 func (s *Stick) updateInput(tx, ty float64) {
@@ -127,17 +127,17 @@ func (s *Stick) updateInput(tx, ty float64) {
 		return
 	}
 
-	// 豁｣隕丞喧
+	// 正規化
 	s.strength = math.Min(dist/s.radius, 1.0)
 	s.inputX = (dx / dist) * s.strength
 	s.inputY = (dy / dist) * s.strength
 }
 
-// Draw 縺ｯ繝・ヰ繝・げ逕ｨ縺ｫ繧ｹ繝・ぅ繝・け繧呈緒逕ｻ縺励∪縺吶・
+// Draw はデバッグ用にスティックを描画します。
 func (s *Stick) Draw(screen *ebiten.Image) {
-	// 閭梧勹縺ｮ蜀・
+	// 背景の円
 	vector.DrawFilledCircle(screen, float32(s.x), float32(s.y), float32(s.radius), color.RGBA{100, 100, 100, 128}, true)
-	// 謖・・菴咲ｽｮ
+	// 指の位置
 	ix := s.x + s.inputX*s.radius
 	iy := s.y + s.inputY*s.radius
 	vector.DrawFilledCircle(screen, float32(ix), float32(iy), float32(s.radius*0.4), color.RGBA{255, 255, 255, 200}, true)

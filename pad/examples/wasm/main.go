@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"fmt"
@@ -52,7 +52,7 @@ Move:
 		g.in.JustReleased(ActionJump),
 		vx, vy, strength))
 
-	// 繝舌・繝√Ε繝ｫ UI 縺ｮ謠冗判
+	// バーチャル UI の描画
 	g.in.Virtual().Draw(screen)
 }
 
@@ -71,7 +71,7 @@ func main() {
 	in.BindGamepadButton(ActionJump, ebiten.StandardGamepadButtonRightBottom)
 	in.BindGamepadAxis(ActionMove, 0, 1)
 
-	// Virtual Pad 縺ｮ險ｭ螳・
+	// Virtual Pad の設定
 	vpad := in.Virtual()
 	jumpBtn := vpad.AddButton().SetPosition(550, 400).SetRadius(40)
 	moveStick := vpad.AddStick().SetPosition(100, 380).SetRadius(60)

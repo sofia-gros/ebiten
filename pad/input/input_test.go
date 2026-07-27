@@ -1,4 +1,4 @@
-﻿package input
+package input
 
 import (
 	"testing"
@@ -7,32 +7,32 @@ import (
 func TestNewInput(t *testing.T) {
 	input := NewInput()
 	if input == nil {
-		t.Fatal("NewInput() 縺・nil 繧定ｿ斐＠縺ｾ縺励◆")
+		t.Fatal("NewInput() が nil を返しました")
 	}
 	if input.actions == nil {
-		t.Error("NewInput() 縺・actions 繝槭ャ繝励ｒ蛻晄悄蛹悶＠縺ｾ縺帙ｓ縺ｧ縺励◆")
+		t.Error("NewInput() が actions マップを初期化しませんでした")
 	}
 }
 
 func TestActionStateInitialValues(t *testing.T) {
 	state := ActionState{}
 	if state.Pressed != false {
-		t.Error("ActionState.Pressed 縺ｮ繝・ヵ繧ｩ繝ｫ繝亥､縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("ActionState.Pressed のデフォルト値は false である必要があります")
 	}
 	if state.JustPressed != false {
-		t.Error("ActionState.JustPressed 縺ｮ繝・ヵ繧ｩ繝ｫ繝亥､縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("ActionState.JustPressed のデフォルト値は false である必要があります")
 	}
 	if state.JustReleased != false {
-		t.Error("ActionState.JustReleased 縺ｮ繝・ヵ繧ｩ繝ｫ繝亥､縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("ActionState.JustReleased のデフォルト値は false である必要があります")
 	}
 	if state.X != 0 {
-		t.Errorf("ActionState.X 縺ｮ繝・ヵ繧ｩ繝ｫ繝亥､縺ｯ 0 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺吶ら樟蝨ｨ縺ｮ蛟､: %f", state.X)
+		t.Errorf("ActionState.X のデフォルト値は 0 である必要があります。現在の値: %f", state.X)
 	}
 	if state.Y != 0 {
-		t.Errorf("ActionState.Y 縺ｮ繝・ヵ繧ｩ繝ｫ繝亥､縺ｯ 0 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺吶ら樟蝨ｨ縺ｮ蛟､: %f", state.Y)
+		t.Errorf("ActionState.Y のデフォルト値は 0 である必要があります。現在の値: %f", state.Y)
 	}
 	if state.Strength != 0 {
-		t.Errorf("ActionState.Strength 縺ｮ繝・ヵ繧ｩ繝ｫ繝亥､縺ｯ 0 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺吶ら樟蝨ｨ縺ｮ蛟､: %f", state.Strength)
+		t.Errorf("ActionState.Strength のデフォルト値は 0 である必要があります。現在の値: %f", state.Strength)
 	}
 }
 
@@ -40,18 +40,18 @@ func TestInputQueries(t *testing.T) {
 	const jump Action = 1
 	input := NewInput()
 
-	// 蛻晄悄迥ｶ諷九〒縺ｯ縺吶∋縺ｦ縺ｮ繧ｯ繧ｨ繝ｪ縺・false 繧定ｿ斐☆蠢・ｦ√′縺ゅｊ縺ｾ縺・
+	// 初期状態ではすべてのクエリが false を返す必要があります
 	if input.Pressed(jump) {
-		t.Error("蛻晄悄迥ｶ諷九・ Pressed() 縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("初期状態の Pressed() は false である必要があります")
 	}
 	if input.JustPressed(jump) {
-		t.Error("蛻晄悄迥ｶ諷九・ JustPressed() 縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("初期状態の JustPressed() は false である必要があります")
 	}
 	if input.JustReleased(jump) {
-		t.Error("蛻晄悄迥ｶ諷九・ JustReleased() 縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("初期状態の JustReleased() は false である必要があります")
 	}
 
-	// 繧ｸ繝｣繝ｳ繝励い繧ｯ繧ｷ繝ｧ繝ｳ縺ｮ迥ｶ諷九ｒ繝｢繝・け縺励∪縺・
+	// ジャンプアクションの状態をモックします
 	if input.actions[DefaultController] == nil {
 		input.actions[DefaultController] = make(map[Action]*ActionState)
 	}
@@ -61,29 +61,29 @@ func TestInputQueries(t *testing.T) {
 		JustReleased: false,
 	}
 
-	// 繝｢繝・け縺輔ｌ縺溽憾諷九〒縺ｮ繧ｯ繧ｨ繝ｪ邨先棡繧堤｢ｺ隱阪＠縺ｾ縺・
+	// モックされた状態でのクエリ結果を確認します
 	if !input.Pressed(jump) {
-		t.Error("state.Pressed 縺・true 縺ｮ蝣ｴ蜷医￣ressed() 縺ｯ true 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("state.Pressed が true の場合、Pressed() は true である必要があります")
 	}
 	if !input.JustPressed(jump) {
-		t.Error("state.JustPressed 縺・true 縺ｮ蝣ｴ蜷医゛ustPressed() 縺ｯ true 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("state.JustPressed が true の場合、JustPressed() は true である必要があります")
 	}
 	if input.JustReleased(jump) {
-		t.Error("state.JustReleased 縺・false 縺ｮ蝣ｴ蜷医゛ustReleased() 縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("state.JustReleased が false の場合、JustReleased() は false である必要があります")
 	}
 
-	// 蛻･縺ｮ迥ｶ諷九ｒ繝｢繝・け縺励∪縺・
+	// 別の状態をモックします
 	input.actions[DefaultController][jump].Pressed = false
 	input.actions[DefaultController][jump].JustPressed = false
 	input.actions[DefaultController][jump].JustReleased = true
 
 	if input.Pressed(jump) {
-		t.Error("state.Pressed 縺・false 縺ｮ蝣ｴ蜷医￣ressed() 縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("state.Pressed が false の場合、Pressed() は false である必要があります")
 	}
 	if input.JustPressed(jump) {
-		t.Error("state.JustPressed 縺・false 縺ｮ蝣ｴ蜷医゛ustPressed() 縺ｯ false 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("state.JustPressed が false の場合、JustPressed() は false である必要があります")
 	}
 	if !input.JustReleased(jump) {
-		t.Error("state.JustReleased 縺・true 縺ｮ蝣ｴ蜷医゛ustReleased() 縺ｯ true 縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｊ縺ｾ縺・)
+		t.Error("state.JustReleased が true の場合、JustReleased() は true である必要があります")
 	}
 }
