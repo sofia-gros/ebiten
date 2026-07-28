@@ -1,5 +1,7 @@
 # ebitenscene
 
+[English](./README_en.md)
+
 ebitenscene は Ebitengine (ebiten) 向けの、実践的で堅牢なシーンマネージャーライブラリです。
 無駄なインスタンス生成（New/Destroy）によるメモリ負荷やバグを防ぐ `Hide/Show` 機能や、シーン間で安全にデータを引き渡す仕組みを備えており、シューティングゲームやRPGなどの本格的なゲーム開発に最適です。
 

@@ -1,5 +1,7 @@
 # phygo (ebitenphysics adapter)
 
+[English](./README_en.md)
+
 `github.com/ab-dek/Phygo-2D` をバックエンドとして利用するアダプターです。
 
 ## サポートしている機能

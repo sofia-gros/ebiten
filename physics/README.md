@@ -1,5 +1,7 @@
 # ebitenphysics
 
+[English](./README_en.md)
+
 ebitenphysics は Ebitengine 向けの物理演算ラッパーライブラリです。
 RPGやプラットフォーマー向けの軽量な Arcade（めり込み防止AABB）モードと、パズルゲーム等向けの本格的な Box2D（円や剛体物理）モードを、まったく同じAPIで切り替えて利用できます。
 

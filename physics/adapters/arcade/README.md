@@ -1,5 +1,7 @@
 # arcade (ebitenphysics adapter)
 
+[English](./README_en.md)
+
 自作の軽量なAABB（Axis-Aligned Bounding Box / めり込み防止）物理エンジンアダプターです。
 外部の依存ライブラリを一切持たず、RPGやプラットフォーマーなど、単純な四角形や円形の押し出し・重なり検知に特化しています。
 

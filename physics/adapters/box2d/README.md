@@ -1,5 +1,7 @@
 # box2d (ebitenphysics adapter)
 
+[English](./README_en.md)
+
 `github.com/ByteArena/box2d` を裏で動かす本格的な剛体物理エンジン用アダプターです。
 複雑な衝突判定や、摩擦・反発などの物理シミュレーションをフルサポートします。
 

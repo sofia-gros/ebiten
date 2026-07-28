@@ -1,5 +1,7 @@
 # ebitenpad
 
+[English](./README_en.md)
+
 ebitenpad は Ebitengine (ebiten) 向けの、アクションベースの入力管理ライブラリです。
 キーボード、ゲームパッド、そしてバーチャルパッド（タッチ操作）を一つの論理的な「アクション」に統合して扱うことができます。
 

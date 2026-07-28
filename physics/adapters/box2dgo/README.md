@@ -1,5 +1,7 @@
 # box2dgo (ebitenphysics adapter)
 
+[English](./README_en.md)
+
 `github.com/oliverbestmann/box2d-go` (Box2D v3のGo言語移植版) を裏で動かす剛体物理エンジン用アダプターです。
 従来の Box2D(v2) アダプターと比較して、より高速でモダンな内部設計のエンジンを利用することができます。複雑な衝突判定や摩擦・反発などの物理シミュレーションをサポートします。
 
