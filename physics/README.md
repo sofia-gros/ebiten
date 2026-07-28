@@ -31,13 +31,14 @@ go get github.com/sofia-gros/ebiten/physics
 | アダプター | 概要                                       | 依存エンジン（各自でダウンロードしてください） |
 | :--------- | :----------------------------------------- | :--------------------------------------------- |
 | `arcade`   | 自作の軽量なAABB（めり込み防止）エンジン。 | なし                                           |
-| `box2d`    | 本格的な2D剛体シミュレーション。           | `go get github.com/ByteArena/box2d`            |
+| `box2d`    | 本格的な2D剛体シミュレーション(v2)。       | `go get github.com/ByteArena/box2d`            |
+| `box2dgo`  | 最新のBox2D(v3)のGo言語移植版。            | `go get github.com/oliverbestmann/box2d-go`    |
 | `phygo`    | 軽量な2D物理エンジン。                     | `go get github.com/ab-dek/Phygo-2D`            |
 
 ```bash
-# 例: Box2Dエンジンを使う場合
-go get github.com/ByteArena/box2d
-go get github.com/sofia-gros/ebiten/physics/adapters/box2d
+# 例: Box2D(v3)エンジンを使う場合
+go get github.com/oliverbestmann/box2d-go
+go get github.com/sofia-gros/ebiten/physics/adapters/box2dgo
 ```
 
 ## 基本的な使い方
