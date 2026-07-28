@@ -32,7 +32,6 @@ go get github.com/sofia-gros/ebiten/physics
 | :--------- | :----------------------------------------- | :--------------------------------------------- |
 | `arcade`   | 自作の軽量なAABB（めり込み防止）エンジン。 | なし                                           |
 | `box2d`    | 本格的な2D剛体シミュレーション。           | `go get github.com/ByteArena/box2d`            |
-| `physix`   | シンプルな2D物理エンジン。                 | `go get github.com/rudransh61/Physix-go`       |
 | `phygo`    | 軽量な2D物理エンジン。                     | `go get github.com/ab-dek/Phygo-2D`            |
 
 ```bash
@@ -125,6 +124,8 @@ func (s *GameScene) Draw(screen *ebiten.Image) {
 物理空間全体と描画を統括するオブジェクトです。
 
 - **`SetWorld(world World)`**: 使用する物理エンジンの実体（アダプター）を注入します。（必須）
+- **`SetGravity(gx, gy float64)`**: ワールド全体に重力を設定します。（例: `SetGravity(0, 100)`）
+- **`Gravity() (float64, float64)`**: 現在の重力を取得します。
 - **`CreateBody(options BodyOptions) Body`**: 空間内に物体を生成します。
 - **`RemoveBody(body Body)`**: 物体を空間および描画リストから完全に削除します。
 - **`Update(dt float64)`**: 物理シミュレーションを `dt` 秒だけ進めます。

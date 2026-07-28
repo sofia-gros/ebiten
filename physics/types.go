@@ -99,4 +99,6 @@ type World interface {
 	CreateBody(options BodyOptions) Body
 	RemoveBody(body Body)
 	Bodies() []Body // Required for Debug Draw
+	SetGravity(gx, gy float64) // Set global gravity
+	Gravity() (float64, float64) // Get global gravity
 }

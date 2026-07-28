@@ -29,36 +29,31 @@ func NewGame() *Game {
 	
 	// Box2Dエンジンをセット
 	g.physManager.SetWorld(box2d.NewWorld())
+	// 共通で重力をセット
+	g.physManager.SetGravity(0, 100)
 
 	// プレイヤー（落下する四角形）
 	g.playerBody = g.physManager.CreateBody(physics.BodyOptions{
 		Type: physics.BodyTypeDynamic,
 		X:    160,
 		Y:    50,
-		Density: 1.0, // Box2DはDensity(密度)がないと動的ボディが回転・落下等で不具合を起こすことがある
-		Friction: 0.3,
-		Restitution: 0.5, // 0.5の反発力で少しバウンドする
 		Shapes: []physics.ShapeDef{
 			{Shape: physics.BoxShape{Width: 32, Height: 32}},
 		},
+		Restitution: 0.8, // 跳ね返り係数
 		OnCollisionBegin: func(other physics.Body) {
 			if other.Group() == GroupFloor {
-				fmt.Println("[Box2D] 床にバウンドしました！")
+				fmt.Printf("[Box2D] 床に着地しました！\n")
 			}
 		},
 	})
 	g.playerBody.SetGroup(GroupPlayer)
-	
-	// Box2DはNewWorld時に重力0の環境を作っているため、手動で下向きの力をかけるか、速度を与える
-	// 今回は下向きの速度を与える
-	g.playerBody.SetVelocity(0, 100)
 
-	// 床（静的オブジェクト）
+	// 床
 	g.floorBody = g.physManager.CreateBody(physics.BodyOptions{
 		Type: physics.BodyTypeStatic,
 		X:    160,
 		Y:    200,
-		Friction: 0.5,
 		Shapes: []physics.ShapeDef{
 			{Shape: physics.BoxShape{Width: 200, Height: 20}},
 		},
@@ -69,27 +64,25 @@ func NewGame() *Game {
 }
 
 func (g *Game) Update() error {
-	// Box2Dのシミュレーションを進める
-	g.physManager.Update(1.0 / 60.0)
-	
-	// Box2Dは摩擦などで止まることがあるので、必要に応じて力を加える
-	// 今回は画面外に落ちた時のリセット処理のみ
+	// 物理エンジンの更新（60FPS想定）
+	g.physManager.World().Step(1.0 / 60.0)
+
+	// 床の下まで落ちたら上に戻す（ループ処理）
 	x, y := g.playerBody.Position()
 	if y > 240 {
 		g.playerBody.SetPosition(x, 0)
-		g.playerBody.SetVelocity(0, 100)
+		g.playerBody.SetVelocity(0, 0)
 	}
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// デバッグ用の枠線描画
 	g.physManager.DrawDebug(screen)
-	
-	ebitenutil.DebugPrint(screen, "Box2D Physics Example")
+	ebitenutil.DebugPrint(screen, "Ebiten Physics: Box2D Engine")
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 240
 }
 

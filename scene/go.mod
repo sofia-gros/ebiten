@@ -1,6 +1,6 @@
 module github.com/sofia-gros/ebiten/scene
 
-go 1.26.3
+go 1.25.1
 
 require github.com/hajimehoshi/ebiten/v2 v2.9.9
 

@@ -31,8 +31,23 @@ func NewManager() *Manager {
 }
 
 // SetWorld injects a specific physics engine adapter into the manager.
-func (m *Manager) SetWorld(world World) {
-	m.world = world
+func (m *Manager) SetWorld(w World) {
+	m.world = w
+}
+
+// SetGravity sets the global gravity for the current physics world.
+func (m *Manager) SetGravity(gx, gy float64) {
+	if m.world != nil {
+		m.world.SetGravity(gx, gy)
+	}
+}
+
+// Gravity returns the current global gravity.
+func (m *Manager) Gravity() (float64, float64) {
+	if m.world != nil {
+		return m.world.Gravity()
+	}
+	return 0, 0
 }
 
 // World returns the current physics world.

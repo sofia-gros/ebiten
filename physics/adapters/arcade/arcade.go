@@ -9,6 +9,7 @@ import (
 // arcadeWorld implements physics.World
 type arcadeWorld struct {
 	bodies []*arcadeBody
+	gx, gy float64
 }
 
 // NewWorld creates a new Arcade physics world.
@@ -18,10 +19,21 @@ func NewWorld() physics.World {
 	}
 }
 
+func (w *arcadeWorld) SetGravity(gx, gy float64) {
+	w.gx = gx
+	w.gy = gy
+}
+
+func (w *arcadeWorld) Gravity() (float64, float64) {
+	return w.gx, w.gy
+}
+
 func (w *arcadeWorld) Step(dt float64) {
 	// 1. Integrate velocities
 	for _, b := range w.bodies {
 		if b.bType == physics.BodyTypeDynamic {
+			b.vx += w.gx * dt
+			b.vy += w.gy * dt
 			b.x += b.vx * dt
 			b.y += b.vy * dt
 			b.rot += b.omega * dt
@@ -244,32 +256,49 @@ func circleBoxCollide(cx, cy, cr, bx, by, bw, bh float64) bool {
 }
 
 func resolveCollision(b1, b2 *arcadeBody) {
-	// A highly simplified push-apart logic.
-	// For a real game, you would calculate the penetration depth and normal.
-	dx := b2.x - b1.x
-	dy := b2.y - b1.y
-	
-	// Normalize
-	length := math.Sqrt(dx*dx + dy*dy)
-	if length == 0 {
-		dx, dy = 1, 0
-		length = 1
+	if b1.bType != physics.BodyTypeDynamic && b2.bType != physics.BodyTypeDynamic {
+		return
 	}
-	nx, ny := dx/length, dy/length
-	
-	// Just a tiny push apart based on velocity
-	push := 1.0
 
-	if b1.bType == physics.BodyTypeDynamic {
-		b1.x -= nx * push
-		b1.y -= ny * push
-		b1.vx *= 0.8 // slight dampening
-		b1.vy *= 0.8
-	}
-	if b2.bType == physics.BodyTypeDynamic {
-		b2.x += nx * push
-		b2.y += ny * push
-		b2.vx *= 0.8
-		b2.vy *= 0.8
+	for _, s1 := range b1.shapes {
+		for _, s2 := range b2.shapes {
+			box1, ok1 := s1.Shape.(physics.BoxShape)
+			box2, ok2 := s2.Shape.(physics.BoxShape)
+			if ok1 && ok2 {
+				x1, y1 := b1.x+s1.OffsetX, b1.y+s1.OffsetY
+				x2, y2 := b2.x+s2.OffsetX, b2.y+s2.OffsetY
+
+				dx := x2 - x1
+				dy := y2 - y1
+
+				halfWidths := box1.Width/2 + box2.Width/2
+				halfHeights := box1.Height/2 + box2.Height/2
+
+				overlapX := halfWidths - math.Abs(dx)
+				overlapY := halfHeights - math.Abs(dy)
+
+				if overlapX > 0 && overlapY > 0 {
+					// Resolve on the axis of least penetration
+					if overlapX < overlapY {
+						if dx > 0 {
+							if b1.bType == physics.BodyTypeDynamic { b1.x -= overlapX; b1.vx = 0 }
+							if b2.bType == physics.BodyTypeDynamic { b2.x += overlapX; b2.vx = 0 }
+						} else {
+							if b1.bType == physics.BodyTypeDynamic { b1.x += overlapX; b1.vx = 0 }
+							if b2.bType == physics.BodyTypeDynamic { b2.x -= overlapX; b2.vx = 0 }
+						}
+					} else {
+						if dy > 0 {
+							if b1.bType == physics.BodyTypeDynamic { b1.y -= overlapY; b1.vy = 0 }
+							if b2.bType == physics.BodyTypeDynamic { b2.y += overlapY; b2.vy = 0 }
+						} else {
+							if b1.bType == physics.BodyTypeDynamic { b1.y += overlapY; b1.vy = 0 }
+							if b2.bType == physics.BodyTypeDynamic { b2.y -= overlapY; b2.vy = 0 }
+						}
+					}
+					return // Resolved
+				}
+			}
+		}
 	}
 }

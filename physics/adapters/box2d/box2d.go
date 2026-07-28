@@ -1,32 +1,32 @@
 package box2d
 
 import (
+	"fmt"
 	"github.com/ByteArena/box2d"
 	"github.com/sofia-gros/ebiten/physics"
 )
 
 // b2WorldWrapper implements physics.World for Box2D
 type b2WorldWrapper struct {
-	world     box2d.B2World
-	bodies    []*b2BodyWrapper
-	contactCb *contactListener
+	world    *box2d.B2World
+	listener *contactListener
+	bodies   []*b2BodyWrapper
 }
 
 // NewWorld creates a new Box2D physics world adapter.
 func NewWorld() physics.World {
-	// Initialize world with no gravity by default, users can apply forces manually, 
-	// or we can expose gravity setting later.
-	gravity := box2d.MakeB2Vec2(0.0, 0.0)
+	// Initialize world with gravity so things fall by default (e.g. 100 pixels/sec^2)
+	gravity := box2d.MakeB2Vec2(0.0, 100.0)
 	w := box2d.MakeB2World(gravity)
 
 	wrapper := &b2WorldWrapper{
-		world:  w,
+		world:  &w,
 		bodies: make([]*b2BodyWrapper, 0),
 	}
 
 	// Setup contact listener
-	wrapper.contactCb = &contactListener{wrapper: wrapper}
-	w.SetContactListener(wrapper.contactCb)
+	wrapper.listener = &contactListener{}
+	wrapper.world.SetContactListener(wrapper.listener)
 
 	return wrapper
 }
@@ -34,6 +34,15 @@ func NewWorld() physics.World {
 func (w *b2WorldWrapper) Step(dt float64) {
 	// Typically 8 velocity iterations and 3 position iterations are recommended.
 	w.world.Step(dt, 8, 3)
+}
+
+func (w *b2WorldWrapper) SetGravity(gx, gy float64) {
+	w.world.SetGravity(box2d.MakeB2Vec2(gx, gy))
+}
+
+func (w *b2WorldWrapper) Gravity() (float64, float64) {
+	g := w.world.GetGravity()
+	return g.X, g.Y
 }
 
 func (w *b2WorldWrapper) CreateBody(options physics.BodyOptions) physics.Body {
@@ -53,6 +62,7 @@ func (w *b2WorldWrapper) CreateBody(options physics.BodyOptions) physics.Body {
 		b2Body:  b2Body,
 		options: options,
 	}
+	b2Body.SetUserData(wrapperBody)
 
 	// Create fixtures for each shape
 	for _, shapeDef := range options.Shapes {
@@ -190,8 +200,10 @@ func (c *contactListener) getBodies(contact box2d.B2ContactInterface) (*b2BodyWr
 }
 
 func (c *contactListener) BeginContact(contact box2d.B2ContactInterface) {
+	fmt.Println("BeginContact CALLED!")
 	wa, wb := c.getBodies(contact)
 	if wa == nil || wb == nil {
+		fmt.Println("[Box2D Debug] getBodies returned nil. wa:", wa, "wb:", wb)
 		return
 	}
 	if wa.options.OnCollisionBegin != nil {
