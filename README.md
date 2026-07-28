@@ -8,8 +8,8 @@ Ebitengine (ebiten) をより強力かつ直感的に扱うためのゲーム開
 | コンポーネント                     | 役割                                                  | 状態                |
 | :--------------------------------- | :---------------------------------------------------- | :------------------ |
 | [**pad**](./pad/README.md)         | アクションベースの入力抽象化＆バーチャルパッド UI     | **Stable (v1.1.0)** |
-| [**scene**](./scene/README.md)     | シーン管理・スタックベースのオーバーレイ制御          | _Coming Soon_       |
-| [**physics**](./physics/README.md) | Arcade/Box2D のバックエンド切り替え式 2D 物理エンジン | _Coming Soon_       |
+| [**scene**](./scene/README.md)     | シーン管理・スタックベースのオーバーレイ制御          | **Stable (v1.0.0)** |
+| [**physics**](./physics/README.md) | Arcade/Box2D のバックエンド切り替え式 2D 物理エンジン | **Stable (v1.0.0)** |
 
 ---
 
