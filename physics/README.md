@@ -2,48 +2,111 @@
 
 [English](./README_en.md)
 
-ebitenphysics は Ebitengine 向けの物理演算ラッパーライブラリです。
-RPGやプラットフォーマー向けの軽量な Arcade（めり込み防止AABB）モードと、パズルゲーム等向けの本格的な Box2D（円や剛体物理）モードを、まったく同じAPIで切り替えて利用できます。
+ebitenphysics は Ebitengine 向けの 2D 物理演算ラッパーライブラリです。
+RPGやプラットフォーマー向けの軽量な `Arcade`（AABBめり込み防止）モードと、本格的な `Box2D`（剛体物理・回転・跳ね返り）モードを、共通の直感的な API でシームレスに切り替えて利用できます。
+
+---
 
 ## 特徴
 
-- **ピュアな設計**: ebitenphysics 本体には特定の物理エンジンが含まれていません。使いたいエンジン（アダプター）だけをインポートするため、ゲームに余計なコードが混入しません。
-- **DIベース**: `arcade` や `box2d` などのエンジンを Manager に渡して動かす設計です。
-- **描画は自由**: 自分で `x, y` を取得して自由に描画することもできますし、画像と一緒に登録して一括描画させることもできます。既存のシーン管理やUIと競合しません。
+- **ピュア＆軽量な設計**: `physics` 本体には特定物理エンジンの実装を含まず、使いたいアダプター（`arcade`, `box2d` 等）だけを注入して利用。
+- **シンプルな2通りのボディ作成**:
+  - **簡易スタイル**: 1行で四角や円の物理ボディを作成。
+  - **本格スタイル**: `BodyOptions` で衝突コールバック・複合当たり判定・グループ番号等を詳細設定。
+- **柔軟な描画**: 位置座標 (`x, y`) を取得して手動描画するアプローチと、画像と紐付けて `physManager.Draw(screen)` で一括描画するアプローチの両方に対応。
 
-## アップデート情報
-
-Version 1.0.0 2026/07/27
-・初期リリース
+---
 
 ## インストール
 
-まずは本体をインストールします。
+本体をインストールします：
 
 ```bash
 go get github.com/sofia-gros/ebiten/physics
 ```
 
-次に、使いたい物理エンジンのアダプターをインストールします。
+次に、利用したい物理エンジンのアダプターをインストールします：
 
-> **⚠️ 注意: 外部エンジンのインストールについて**
-> 本ライブラリ（ebitenphysics）自体は、外部の物理エンジンのコードを一切含んでいません。
-> `box2d` などの外部エンジンを利用する場合は、上記のアダプターに加え、**ベースとなる物理エンジン本体もユーザー自身でダウンロード（`go get`）しておく**必要があります。
+| アダプター | 概要 | 依存エンジン（必要に応じてダウンロード） |
+| :--- | :--- | :--- |
+| `arcade` | 軽量な AABB（めり込み防止）モード。物理計算なしでプラットフォーマー等に最適。 | なし |
+| `box2d` | 本格的な 2D 剛体物理シミュレーション (Box2D v2)。 | `go get github.com/ByteArena/box2d` |
+| `box2dgo` | Box2D v3 の Go 移植版。 | `go get github.com/oliverbestmann/box2d-go` |
+| `phygo` | 軽量な 2D 物理エンジン。 | `go get github.com/ab-dek/Phygo-2D` |
 
-| アダプター | 概要                                       | 依存エンジン（各自でダウンロードしてください） |
-| :--------- | :----------------------------------------- | :--------------------------------------------- |
-| `arcade`   | 自作の軽量なAABB（めり込み防止）エンジン。 | なし                                           |
-| `box2d`    | 本格的な2D剛体シミュレーション(v2)。       | `go get github.com/ByteArena/box2d`            |
-| `box2dgo`  | 最新のBox2D(v3)のGo言語移植版。            | `go get github.com/oliverbestmann/box2d-go`    |
-| `phygo`    | 軽量な2D物理エンジン。                     | `go get github.com/ab-dek/Phygo-2D`            |
 
 ```bash
-# 例: Box2D(v3)エンジンを使う場合
+# 例1: アーケード(AABB)モードを使う場合（追加の外部ライブラリ不要）
+go get github.com/sofia-gros/ebiten/physics/adapters/arcade
+
+# 例2: Box2D (v3) を使う場合（ベースエンジン本体も一緒にダウンロード）
 go get github.com/oliverbestmann/box2d-go
 go get github.com/sofia-gros/ebiten/physics/adapters/box2dgo
 ```
 
-## 基本的な使い方
+
+---
+
+## 使い方
+
+### クイックスタート
+
+最小限の設定で四角形（`BoxShape`）の物理ボディを作成し、位置座標を取得して描画する基本的な記述方法です。
+
+```go
+package main
+
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/sofia-gros/ebiten/physics"
+	"github.com/sofia-gros/ebiten/physics/adapters/arcade"
+)
+
+type Game struct {
+	phys *physics.Manager
+	body physics.Body
+}
+
+func (g *Game) Init() {
+	g.phys = physics.NewManager()
+	g.phys.SetWorld(arcade.NewWorld()) // Arcade エンジンをセット
+
+	// 100, 100 の位置に 32x32px の四角形動的ボディを作成
+	g.body = g.phys.CreateBody(physics.BodyOptions{
+		Type:  physics.BodyTypeDynamic,
+		X:     100,
+		Y:     100,
+		Shape: physics.BoxShape{Width: 32, Height: 32},
+	})
+}
+
+func (g *Game) Update() error {
+	// 移動速度の設定
+	g.body.SetVelocity(100, 0)
+
+	// 物理計算の更新 (60FPS)
+	g.phys.Update(1.0 / 60.0)
+	return nil
+}
+
+func (g *Game) Draw(screen *ebiten.Image) {
+	// 座標を取り出して手動描画
+	x, y := g.body.Position()
+	_ = x
+	_ = y
+
+	// 当たり判定枠線のデバッグ描画
+	g.phys.DrawDebug(screen)
+}
+```
+
+---
+
+### 全機能の使い方
+
+衝突グループの指定、接触イベントコールバック (`OnCollisionBegin`)、および画像の一括描画制御を行う全機能の使い方です。
+
+
 
 ```go
 package main
@@ -52,139 +115,80 @@ import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/sofia-gros/ebiten/physics"
-
-	// 使いたい物理エンジンをインポート
 	"github.com/sofia-gros/ebiten/physics/adapters/arcade"
 )
 
-// 衝突グループの定義（レイヤー番号みたいなもの）
 const (
 	GroupPlayer physics.Group = 1
 	GroupEnemy  physics.Group = 2
 )
 
-type GameScene struct {
-	physManager *physics.Manager
-	playerBody  physics.Body
-	playerImage *ebiten.Image
+type Game struct {
+	phys       *physics.Manager
+	playerBody physics.Body
+	playerImg  *ebiten.Image
 }
 
-func (s *GameScene) Init() {
-	s.physManager = physics.NewManager()
-	s.physManager.SetWorld(arcade.NewWorld())
+func (g *Game) Init() {
+	g.phys = physics.NewManager()
+	g.phys.SetWorld(arcade.NewWorld())
 
-	// Body（物理演算用の実体）を作る
-	s.playerBody = s.physManager.CreateBody(physics.BodyOptions{
+	// 本格スタイル: BodyOptions で詳細設定
+	g.playerBody = g.phys.CreateBody(physics.BodyOptions{
 		Type: physics.BodyTypeDynamic,
 		X:    100,
 		Y:    100,
-		// 基本的な四角形の当たり判定
 		Shapes: []physics.ShapeDef{
 			{Shape: physics.BoxShape{Width: 32, Height: 32}},
 		},
-		// 衝突コールバック
 		OnCollisionBegin: func(other physics.Body) {
 			if other.Group() == GroupEnemy {
-				fmt.Println("敵にヒット！")
+				fmt.Println("敵と衝突しました！")
 			}
 		},
 	})
 
-	// グループ番号を割り当てる
-	s.playerBody.SetGroup(GroupPlayer)
+	g.playerBody.SetGroup(GroupPlayer)
 
-	// 一括描画用に登録
-	s.physManager.AddRenderable(s.playerBody, s.playerImage)
+	// 一括描画用にスプライト画像とペア登録
+	g.phys.AddRenderable(g.playerBody, g.playerImg)
 }
 
-func (s *GameScene) Update() error {
-	s.physManager.Update(1.0 / 60.0)
+func (g *Game) Update() error {
+	g.phys.Update(1.0 / 60.0)
 	return nil
 }
 
-func (s *GameScene) Draw(screen *ebiten.Image) {
-	// 自分で描画する場合
-	// x, y := s.playerBody.Position()
-	// op := &ebiten.DrawImageOptions{}
-	// op.GeoM.Translate(x, y)
-	// screen.DrawImage(s.playerImage, op)
+func (g *Game) Draw(screen *ebiten.Image) {
+	// ペア登録された全オブジェクトを一括描画
+	g.phys.Draw(screen)
 
-	// マネージャーに任せる場合
-	s.physManager.Draw(screen)
-
-	// デバッグ用当たり判定の枠線を描画する
-	s.physManager.DrawDebug(screen)
+	// デバッグ用当たり判定の枠描画
+	g.phys.DrawDebug(screen)
 }
 ```
 
-## API・機能詳細
+---
 
-本ライブラリが提供するインターフェース（すべての物理エンジン共通）の主な機能一覧です。
-※ 摩擦や反発など、どのパラメータが実際に有効になるかは、注入した**物理エンジンのアダプター（のREADME）**に従います。
+## 主要 API リファレンス
 
-### 1. `physics.Manager` のメソッド
-
-物理空間全体と描画を統括するオブジェクトです。
-
+### `physics.Manager`
 - **`SetWorld(world World)`**: 使用する物理エンジンの実体（アダプター）を注入します。（必須）
 - **`SetGravity(gx, gy float64)`**: ワールド全体に重力を設定します。（例: `SetGravity(0, 100)`）
-- **`Gravity() (float64, float64)`**: 現在の重力を取得します。
-- **`CreateBody(options BodyOptions) Body`**: 空間内に物体を生成します。
-- **`RemoveBody(body Body)`**: 物体を空間および描画リストから完全に削除します。
-- **`Update(dt float64)`**: 物理シミュレーションを `dt` 秒だけ進めます。
-- **`AddRenderable(body Body, img *ebiten.Image)`**: 一括描画対象として、画像と物理ボディを紐付けて登録します。
-- **`Draw(screen *ebiten.Image)`**: `AddRenderable` で登録されたペアを一括で描画します。
-- **`DrawDebug(screen *ebiten.Image)`**: 各ボディの当たり判定（矩形や円）の枠線を画面上に可視化します。
+- **`CreateBody(options BodyOptions) Body`**: 空間内に物理ボディを生成します。
+- **`RemoveBody(body Body)`**: 物体を空間および描画リストから削除します。
 
-### 2. `physics.Body` のメソッド
+- `AddRenderable(body Body, img *ebiten.Image)`: スプライトと物理ボディを一括描画用に登録。
+- `Draw(screen *ebiten.Image)`: 登録ペアを一括描画。
+- `DrawDebug(screen *ebiten.Image)`: 当たり判定の枠線をデバッグ描画。
 
-`CreateBody` で返される物理オブジェクトです。いつでも状態の取得・変更が可能です。
+### `physics.Body`
+- `Position() (x, y float64)` / `SetPosition(x, y float64)`: 座標取得・移動。
+- `Velocity() (vx, vy float64)` / `SetVelocity(vx, vy float64)`: 速度取得・設定。
+- `ApplyForce(fx, fy float64)`: 力を加える。
+- `Group() physics.Group` / `SetGroup(group Group)`: 衝突グループ（レイヤー）の取得・設定。
 
-#### 状態の取得（Get）
-
-- **`Position() (x, y float64)`**: 現在のX, Y座標を取得します。
-- **`Rotation() float64`**: 現在の回転角度（ラジアン）を取得します。
-- **`Velocity() (vx, vy float64)`**: 現在のX, Y方向の速度を取得します。
-- **`AngularVelocity() float64`**: 現在の回転速度を取得します。
-- **`Group() physics.Group`**: 衝突レイヤーや種類の判定に使うためのグループ番号（数値）を取得します。
-- **`Data() interface{}`**: ボディに紐付けられた任意のユーザーデータ（独自の構造体ポインタなど）を取得します。
-
-#### 状態の変更（Set）
-
-- **`SetPosition(x, y float64)`**: 強制的に座標を移動させます（ワープ）。
-- **`SetRotation(angle float64)`**: 強制的に角度を変更します。
-- **`SetVelocity(vx, vy float64)`**: 指定した速度（ピクセル/秒など）を直接セットします。ジャンプやダッシュなどの実装に便利です。
-- **`SetAngularVelocity(omega float64)`**: 回転速度をセットします。
-- **`ApplyForce(fx, fy float64)`**: 現在の速度に対して徐々に力を加えます（風や重力などの持続的な力向き）。
-- **`SetGroup(group physics.Group)`**: オブジェクトの種類（Player=1, Enemy=2 など）を数値で割り当てます。文字列比較より高速です。
-- **`SetData(data interface{})`**: 衝突判定時などで詳細な処理をするために、独自のデータ（ステータス構造体など）を持たせることができます。
-
-### 3. `physics.BodyOptions` (生成時の設定)
-
-- **`Type`**: `physics.BodyTypeDynamic`（動く物体）か `physics.BodyTypeStatic`（動かない壁など）を指定。
-- **`Shapes []ShapeDef`**: オブジェクトを構成する形状。複数渡すことで、腕や足が独立した「複合形状」を1つのボディとして作れます。
-- **`Friction`**: 摩擦係数。（滑りにくさ）
-- **`Restitution`**: 反発係数。（バウンス・跳ね返りやすさ）
-- **`Density`**: 密度。質量計算に使われます。
-- **`IsSensor`**: `true` にすると、衝突判定（コールバック）は発生しますが、物理的に押し返されることはなくなります（アイテム取得エリアや毒沼などに最適）。
-
-#### 衝突コールバック
-
-- **`OnCollisionBegin func(other Body)`**: 他の物体と「接触した瞬間」に1回だけ呼ばれます。
-- **`OnOverlap func(other Body)`**: 他の物体と「重なっている（または接触し続けている）間」毎フレーム呼ばれ続けます。
-- **`OnCollisionEnd func(other Body)`**: 他の物体から「離れた瞬間」に1回だけ呼ばれます。
-
-### 4. 形状（Shape）の定義
-
-`ShapeDef` を使うことで、ボディの中心座標から相対的にズラした位置に形状を配置できます。
-
-```go
-// 中心の円の横に、四角形をくっつけた形の例
-Shapes: []physics.ShapeDef{
-	{Shape: physics.CircleShape{Radius: 16}, OffsetX: 0, OffsetY: 0},
-	{Shape: physics.BoxShape{Width: 32, Height: 8}, OffsetX: 32, OffsetY: 0},
-}
-```
+---
 
 ## ライセンス
 

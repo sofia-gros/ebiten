@@ -60,8 +60,17 @@ func (m *Manager) CreateBody(options BodyOptions) Body {
 	if m.world == nil {
 		panic("physics: CreateBody called before SetWorld")
 	}
+
+	// Normalize single Shape into Shapes slice for convenience
+	if len(options.Shapes) == 0 && options.Shape != nil {
+		options.Shapes = []ShapeDef{
+			{Shape: options.Shape},
+		}
+	}
+
 	return m.world.CreateBody(options)
 }
+
 
 // RemoveBody removes a body from the active world and also removes it from renderables.
 func (m *Manager) RemoveBody(body Body) {

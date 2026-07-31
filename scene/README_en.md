@@ -24,7 +24,9 @@ Version 1.0.0 2026/07/27
 go get github.com/sofia-gros/ebiten/scene
 ```
 
-## Basic Usage
+## Usage
+
+### Quick Start
 
 ```go
 package main
@@ -57,6 +59,7 @@ type GameScene struct {
 	Score int
 	pause *PauseScene // Hold pointer to reuse
 }
+
 
 func (s *GameScene) Update(ctx *scene.Context) error {
 	s.Score += 1 // Increment score
@@ -145,7 +148,9 @@ func main() {
 - `Context`: The object passed to each scene's `Update`. Used by scenes to instruct screen transitions to the manager.
 - `Scene`: The interface that each screen must implement (`Update`, `Draw`).
 
-### Key Methods of Context
+### Full Usage
+
+Below is the complete reference of methods provided by `scene.Context` for transitioning and stacking scenes:
 
 Screen operations called via `Context` are not reflected immediately; they are safely applied **at the end of that frame (specifically, before the next Update begins)**.
 
