@@ -12,6 +12,13 @@ Ebitengine (ebiten) をより強力かつ直感的に扱うためのゲーム開
 | [**pad**](./pad/README.md)         | アクションベースの入力抽象化＆バーチャルパッド UI     | **Stable (v1.1.0)** |
 | [**scene**](./scene/README.md)     | シーン管理・スタックベースのオーバーレイ制御          | **Stable (v1.0.0)** |
 | [**physics**](./physics/README.md) | Arcade/Box2D のバックエンド切り替え式 2D 物理エンジン | **Stable (v1.0.0)** |
+| [**emit**](./emit/README.md)       | 軽量かつ型安全なイベントディスパッチャー／エミッター | **Stable (v1.0.0)** |
+| [**asset**](./asset/README.md)     | 画像・音声・データ・マップ等の一元管理マネージャー   | **Stable (v1.0.0)** |
+| [**sound**](./sound/README.md)     | サウンド・BGM/SE/ボイス・2D音源制御マネージャー       | **Stable (v1.0.0)** |
+| [**save**](./save/README.md)       | フラット保存・暗号化・自動穴埋めスロットマネージャー | **Stable (v1.0.0)** |
+| [**camera**](./camera/README.md)   | 2Dカメラ・マルチカメラ・ビューポート・シェーダー制御  | **Stable (v1.0.0)** |
+| [**tween**](./tween/README.md)     | イージング＆動的コントロール・グループアニメーション  | **Stable (v1.0.0)** |
+| [**ui**](./ui/README.md)           | ゲームUI・9スライス・状態別画像ボタン・レイアウト     | **Stable (v1.0.0)** |
 
 ---
 
@@ -34,6 +41,55 @@ Ebitengine (ebiten) をより強力かつ直感的に扱うためのゲーム開
 RPGやプラットフォーマー向けの軽量な `Arcade`（めり込み防止AABB）モードと、パズルゲーム等向けの本格的な `Box2D`（円や剛体物理）モードを同一のAPIでシームレスに切り替えて利用できる、Ebitengine 専用の物理ラッピングライブラリです。
 
 [詳しくはこちら](./physics/README.md)
+
+### emit (イベントディスパッチャー)
+
+Go のジェネリクスを活用した軽量・型安全なイベントディスパッチャーです。他ライブラリに一切依存せず単体で動作し、コンポーネント間や Tween などの一時的なアニメーションイベントの発行・受講・登録解除をシンプルに行えます。
+
+[詳しくはこちら](./emit/README.md)
+
+### asset (アセットマネージャー)
+
+Phaser 風のシンプルな操作感を提供するアセット管理ライブラリです。画像（単体・コマ割りスプライト）、音声、Tilemap マップデータ、アニメーション定義、JSON/TOML/YAML/CSV データの一括ロード、型安全な変換、キャッシュ解除を一元管理します。
+
+[詳しくはこちら](./asset/README.md)
+
+### sound (サウンドマネージャー)
+
+Ebitengine 向けの直感的なサウンド管理ライブラリです。`iota` による柔軟なサウンドタイプ拡張（BGM, SE, Voice, Env, Custom）、クロスフェード、リアルタイムポジショナルサウンド（2D音源追従）、フェード制御の一括停止やポーズを一元管理します。
+
+[詳しくはこちら](./sound/README.md)
+
+### save (セーブデータマネージャー)
+
+直感的で安全なセーブデータ管理ライブラリです。平文テキスト (JSON/YAML) やバイナリでの安全なサブディレクトリ保存、`SaveNewSlot` による削除済み欠番スロットの自動再利用穴埋め保存、AES 暗号化、改ざん検出、クラッシュ時のバックアップ自動復旧を一元管理します。
+
+[詳しくはこちら](./save/README.md)
+
+### camera (2Dカメラマネージャー)
+
+Ebitengine 向けの軽量・高機能な 2D カメラライブラリです。純粋な座標制御 (`SetPos`)、画面振動 (Shake)、境界制限 (Bounds)、`cam.Render` による外部ライブラリ (pad, physics) のクロージャ描画、ビューポート切り抜き、Custom Shader 自動切り替え、`ZIndex` 優先度によるマルチカメラ一括レンダリングを一元管理します。
+
+[詳しくはこちら](./camera/README.md)
+
+### tween (イージング＆アニメーション補間)
+
+安全で高機能なイージング＆アニメーション補間ライブラリです。`tween.New(&Option{...}).Play()` による安全な定義と明示的再生開始、`OnUpdate` コールバック、個別の動的制御 (`Pause`, `Resume`, `Restart`, `Stop`)、`Group` によるカテゴリ別一括コントロール、豊富ないイージング関数を一元管理します。
+
+[詳しくはこちら](./tween/README.md)
+
+### ui (ゲームUIコンポーネント)
+
+直感的で拡張性の高い 2D ゲーム UI ライブラリです。9スライス (`NineSlice`)、状態別画像切り替えボタン (`Button`)、文字入力 (`TextInput`)、スクロール枠 (`ScrollBox`)、スライダー (`Slider`)、自動配置 (`VBox/HBox`)、全要素での統一ゲッター/セッター (`SetPos/Pos`, `SetSize/Size`, `SetText/Text`, `SetGrayscale`)、`camera` / `pad` オプショナル接続を一元管理します。
+
+[詳しくはこちら](./ui/README.md)
+
+
+
+
+
+
+
 
 ---
 
