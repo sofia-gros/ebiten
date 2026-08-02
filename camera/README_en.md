@@ -123,6 +123,27 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 ---
 
+## API Reference
+
+### `camera.Camera`
+- `New(width, height)`: Creates a new camera with specified dimensions.
+- `SetPos(x, y)` / `Pos() (x, y)`: Set / get camera center position.
+- `Move(dx, dy)` / `MoveTo(targetX, targetY, speed)`: Move camera / smoothly interpolate towards target.
+- `SetZoom(zoom)` / `Zoom()`: Set / get zoom level.
+- `SetRotation(angle)` / `Rotation()`: Set / get rotation angle in radians.
+- `Forward() (dirX, dirY)` / `Right() (rtX, rtY)`: Get camera forward / right unit vectors for WASD movement relative to camera orientation.
+- `Direction() (dirX, dirY)`: Get camera facing unit vector.
+- `SetBounds(minX, minY, maxX, maxY)`: Set world bounds for camera clamping.
+- `SetViewport(x, y, w, h)`: Set output viewport rectangle (useful for mini-maps).
+- `Shake(strength, durationSec)`: Trigger screen shake.
+- `SetShader(shader, opts...)` / `ClearShader()`: Apply or clear custom shader.
+- `ScreenToWorld(screenX, screenY)` / `WorldToScreen(worldX, worldY)`: Transform coordinates.
+- `VisibleBounds()`: Get currently visible world bounds `(minX, minY, maxX, maxY)` for culling.
+- `Render(screen, drawFunc)`: Execute draw closure with camera matrix and viewport applied.
+
+---
+
 ## License
+
 
 MIT License

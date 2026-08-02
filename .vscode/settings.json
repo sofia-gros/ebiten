@@ -1,0 +1,1 @@
+{"files.exclude": {"**/build": true}, "C_Cpp.excludePath": ["**/build/**"]}

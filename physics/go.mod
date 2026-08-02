@@ -1,6 +1,6 @@
 module github.com/sofia-gros/ebiten/physics
 
-go 1.25.1
+go 1.26.5
 
 require github.com/hajimehoshi/ebiten/v2 v2.9.9
 

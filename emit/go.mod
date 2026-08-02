@@ -1,3 +1,3 @@
 module github.com/sofia-gros/ebiten/emit
 
-go 1.25.1
+go 1.26.5

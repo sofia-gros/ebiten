@@ -1,3 +1,5 @@
+
+
 package main
 
 import (
@@ -177,7 +179,7 @@ func main() {
 	}
 
 	ebiten.SetWindowSize(psvita.ScreenWidth, psvita.ScreenHeight)
-	ebiten.SetWindowTitle("PSVita Ebiten Physics Demo")
+	ebiten.SetWindowTitle("PSVita Ebiten Physics Demo (psvita_build)")
 
 	if err := ebiten.RunGame(NewDemoGame()); err != nil {
 		log.Fatal(err)

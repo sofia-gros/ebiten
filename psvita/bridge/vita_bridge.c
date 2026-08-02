@@ -67,9 +67,16 @@ int vita_bridge_set_cpu_clock(int freq_mhz) {
     return scePowerSetArmClockFrequency(freq_mhz);
 }
 
+int main(int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
+    vita_bridge_init();
+    // WASM から変換された C モジュールの初期化
+    return 0;
+}
+
 #else
 
-// Non-Vita stub implementations
 void vita_bridge_init(void) {}
 int vita_bridge_get_touch_front(VitaTouchPoint* out_points, int max_count) { (void)out_points; (void)max_count; return 0; }
 int vita_bridge_get_touch_back(VitaTouchPoint* out_points, int max_count) { (void)out_points; (void)max_count; return 0; }
@@ -79,4 +86,12 @@ int vita_bridge_get_battery_level(void) { return 100; }
 int vita_bridge_is_charging(void) { return 1; }
 int vita_bridge_set_cpu_clock(int freq_mhz) { (void)freq_mhz; return 0; }
 
+int main(int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
+    return 0;
+}
+
 #endif
+
+

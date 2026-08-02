@@ -4,15 +4,22 @@ import (
 	"reflect"
 )
 
+func getType[T any]() reflect.Type {
+	var zero T
+	t := reflect.TypeOf(zero)
+	if t == nil {
+		t = reflect.TypeOf((*T)(nil)).Elem()
+	}
+	return t
+}
+
 // On は指定したイベント型 T のハンドラを登録します。
 // 登録解除（削除）に使用できる ListenerID を返します。
 func On[T any](e *Emitter, handler func(T)) ListenerID {
 	if e == nil || handler == nil {
 		return 0
 	}
-	var zero T
-	t := reflect.TypeOf(zero)
-	return e.addListener(t, handler, false)
+	return e.addListener(getType[T](), handler, false)
 }
 
 // Once は指定したイベント型 T のハンドラを1回限り実行されるよう登録します。
@@ -21,9 +28,7 @@ func Once[T any](e *Emitter, handler func(T)) ListenerID {
 	if e == nil || handler == nil {
 		return 0
 	}
-	var zero T
-	t := reflect.TypeOf(zero)
-	return e.addListener(t, handler, true)
+	return e.addListener(getType[T](), handler, true)
 }
 
 // Off は指定した ListenerID のリスナーを登録解除（削除）します。
@@ -40,9 +45,7 @@ func RemoveAll[T any](e *Emitter) {
 	if e == nil {
 		return
 	}
-	var zero T
-	t := reflect.TypeOf(zero)
-	e.removeListenersByType(t)
+	e.removeListenersByType(getType[T]())
 }
 
 // Emit はイベント event を即座に発行し、登録されているすべてのハンドラを呼び出します。
@@ -52,8 +55,7 @@ func Emit[T any](e *Emitter, event T) {
 		return
 	}
 
-	var zero T
-	t := reflect.TypeOf(zero)
+	t := getType[T]()
 
 	// ハンドラスライスの安全なスナップショットを作成
 	e.mu.RLock()
@@ -94,8 +96,7 @@ func Queue[T any](e *Emitter, event T) {
 		return
 	}
 
-	var zero T
-	t := reflect.TypeOf(zero)
+	t := getType[T]()
 
 	e.queueMu.Lock()
 	e.eventQueue = append(e.eventQueue, queuedEvent{
@@ -146,10 +147,16 @@ func (e *Emitter) dispatchDynamic(t reflect.Type, eventData any) {
 	var onceIDs []ListenerID
 
 	for _, l := range targets {
-		// リフレクションによる関数呼び出し
+		// リフレクションによる関数呼び出し (nil interface/struct データ対応)
 		v := reflect.ValueOf(l.fn)
 		if v.IsValid() {
-			v.Call([]reflect.Value{reflect.ValueOf(eventData)})
+			var argVal reflect.Value
+			if eventData == nil {
+				argVal = reflect.Zero(t)
+			} else {
+				argVal = reflect.ValueOf(eventData)
+			}
+			v.Call([]reflect.Value{argVal})
 		}
 		if l.once {
 			onceIDs = append(onceIDs, l.id)
@@ -160,3 +167,4 @@ func (e *Emitter) dispatchDynamic(t reflect.Type, eventData any) {
 		e.removeListener(id)
 	}
 }
+

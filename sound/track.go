@@ -85,8 +85,11 @@ func (t *Track) SetPosition(sourceX, sourceY, listenerX, listenerY, maxDistance 
 		return
 	}
 
+	// dx = 音源X - リスナーX
+	// dx > 0 のとき音源はリスナーの右側にあるため、正のパン値 (+1.0: 右) になるよう設定
 	dx := sourceX - listenerX
 	dy := sourceY - listenerY
+
 	dist := math.Sqrt(dx*dx + dy*dy)
 
 	// 距離減衰計算 (0.0 〜 1.0)
@@ -95,7 +98,7 @@ func (t *Track) SetPosition(sourceX, sourceY, listenerX, listenerY, maxDistance 
 		volFactor = 0.0
 	}
 
-	// 左右パン計算 (dx に応じて -1.0 〜 1.0)
+	// 左右パン計算 (-1.0: 左 〜 +1.0: 右)
 	panFactor := dx / maxDistance
 	if panFactor < -1.0 {
 		panFactor = -1.0

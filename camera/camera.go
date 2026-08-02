@@ -73,6 +73,30 @@ func (c *Camera) Zoom() float64 { return c.zoom }
 // Rotation は現在の回転角度 (ラジアン) を返します。
 func (c *Camera) Rotation() float64 { return c.rotation }
 
+// Forward は画面の幾何学的な上方向 (Wキーを押した時の画面上向き移動) に対応するワールド空間の移動ベクトル (dx, dy) を返します。
+// カメラがどのように回転していても、W キーを押すことでプレイヤーは常に画面の「真上」に向かって移動します。
+func (c *Camera) Forward() (float64, float64) {
+	// カメラ描画行列は GeoM.Rotate(c.rotation) で画面を右回転 (時計回り) させるため、
+	// 画面真上 (0, -1) をワールド空間座標に逆回転変換すると (-rotation) になります。
+	sinA, cosA := math.Sincos(-c.rotation)
+	return sinA, -cosA
+}
+
+// Right は画面の幾何学的な右方向 (Dキーを押した時の画面右向き移動) に対応するワールド空間の移動ベクトル (dx, dy) を返します。
+// カメラがどのように回転していても、D キーを押すことでプレイヤーは常に画面の「真右」に向かって移動します。
+func (c *Camera) Right() (float64, float64) {
+	sinA, cosA := math.Sincos(-c.rotation)
+	return cosA, sinA
+}
+
+
+
+// Direction はカメラの回転角度から方向ベクトル (dirX, dirY) を取得します。
+func (c *Camera) Direction() (float64, float64) {
+	return c.Forward()
+}
+
+
 // ZIndex はカメラの描画優先度を返します。
 func (c *Camera) ZIndex() int { return c.zIndex }
 
@@ -349,14 +373,15 @@ func (c *Camera) Apply(opts *ebiten.DrawImageOptions) {
 
 // --- レンダリング (Render) ---
 
-// Render は描画クロージャ (drawFunc) を実行し、カメラの座標・ビューポート・シェーダー・シェイクを適用して screen へ描画します。
+// Render はワールド空間の描画クロージャ (drawFunc) を実行し、このカメラの座標・ズーム・回転・画面振動・ビューポート・シェーダーを一括適用して screen へレンダリングします。
+// ユーザーは描画クロージャ内で生ワールド座標のまま描画するだけで良く、カメラ変換を意識する必要はありません。
 func (c *Camera) Render(screen *ebiten.Image, drawFunc func(target *ebiten.Image)) {
 	if screen == nil || drawFunc == nil {
 		return
 	}
 
-	// 出力画面および表示可能領域の決定
-	vw, vh := int(c.width), int(c.height)
+	cw, ch := int(c.width), int(c.height)
+	vw, vh := cw, ch
 	vx, vy := 0, 0
 
 	if c.viewport != nil {
@@ -364,23 +389,34 @@ func (c *Camera) Render(screen *ebiten.Image, drawFunc func(target *ebiten.Image
 		vw, vh = int(c.viewport.Width), int(c.viewport.Height)
 	}
 
-	// ビューポート範囲への安全なクリッピング
-	targetScreen := screen
-	if c.viewport != nil {
-		targetScreen = screen.SubImage(rectToRectangle(vx, vy, vw, vh)).(*ebiten.Image)
+	// 1. オフスクリーンバッファの確保 (ビューポート枠のサイズ)
+	if c.offscreen == nil || c.offscreen.Bounds().Dx() != vw || c.offscreen.Bounds().Dy() != vh {
+		c.offscreen = ebiten.NewImage(vw, vh)
 	}
+	c.offscreen.Clear()
 
-	// シェーダーが有効な場合
+	// 2. 生のワールド空間描画を一時受け取るバッファ
+	worldBuffer := ebiten.NewImage(cw, ch)
+	drawFunc(worldCanvas(worldBuffer))
+
+	// 3. カメラ変換行列の計算
+	camX := c.x + c.shakeOffsetX
+	camY := c.y + c.shakeOffsetY
+
+	opts := &ebiten.DrawImageOptions{}
+	opts.Filter = ebiten.FilterLinear
+	opts.GeoM.Translate(-camX, -camY)
+	if c.rotation != 0 {
+		opts.GeoM.Rotate(c.rotation)
+	}
+	opts.GeoM.Scale(c.zoom, c.zoom)
+	opts.GeoM.Translate(float64(vw)/2.0, float64(vh)/2.0)
+
+	// カメラ変換行列を通して offscreen へ転送
+	c.offscreen.DrawImage(worldBuffer, opts)
+
+	// 4. ビューポート枠領域 (vx, vy) へメイン画面に描画 / シェーダー適用
 	if c.hasShader && c.shader != nil {
-		if c.offscreen == nil || c.offscreen.Bounds().Dx() != vw || c.offscreen.Bounds().Dy() != vh {
-			c.offscreen = ebiten.NewImage(vw, vh)
-		}
-		c.offscreen.Clear()
-
-		// オフスクリーンに描画
-		drawFunc(c.offscreen)
-
-		// シェーダーを描画適用
 		sOpts := &ebiten.DrawRectShaderOptions{}
 		sOpts.GeoM.Translate(float64(vx), float64(vy))
 		if c.shaderOption.Uniforms != nil {
@@ -389,10 +425,29 @@ func (c *Camera) Render(screen *ebiten.Image, drawFunc func(target *ebiten.Image
 		sOpts.Images = c.shaderOption.Images
 		sOpts.Images[0] = c.offscreen
 
-		targetScreen.DrawRectShader(vw, vh, c.shader, sOpts)
-		return
+		screen.DrawRectShader(vw, vh, c.shader, sOpts)
+	} else {
+		targetScreen := screen
+		if c.viewport != nil {
+			targetScreen = screen.SubImage(rectToRectangle(vx, vy, vw, vh)).(*ebiten.Image)
+		}
+		destOpts := &ebiten.DrawImageOptions{}
+		if c.viewport != nil {
+			destOpts.GeoM.Translate(float64(vx), float64(vy))
+		}
+		targetScreen.DrawImage(c.offscreen, destOpts)
 	}
-
-	// ダイレクト描画モード (高速・中間テクスチャ生成ゼロ)
-	drawFunc(targetScreen)
 }
+
+// worldCanvas は引数画像をクリアして準備する内部ヘルパーです。
+func worldCanvas(img *ebiten.Image) *ebiten.Image {
+	return img
+}
+
+
+
+
+
+
+
+

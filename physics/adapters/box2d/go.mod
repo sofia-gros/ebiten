@@ -1,6 +1,6 @@
 module github.com/sofia-gros/ebiten/physics/adapters/box2d
 
-go 1.25.1
+go 1.26.5
 
 require (
 	github.com/ByteArena/box2d v1.0.2

@@ -157,6 +157,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 - `Move(dx, dy)` / `MoveTo(targetX, targetY, speed)`: カメラの移動・滑らかな補間移動。
 - `SetZoom(zoom)` / `Zoom()`: ズーム倍率の設定・取得。
 - `SetRotation(angle)` / `Rotation()`: 回転角度の設定・取得。
+- `Forward() (dirX, dirY)` / `Right() (rtX, rtY)`: カメラの向き（正面・右方向）の単位ベクトルを取得（回転時の相対 WASD 移動などに利用）。
+- `Direction() (dirX, dirY)`: カメラの向きベクトルを取得。
 - `SetBounds(minX, minY, maxX, maxY)`: ワールド移動境界制限の設定。
 - `SetViewport(x, y, w, h)`: 画面出力領域の設定 (ミニマップ用)。
 - `Shake(strength, durationSec)`: 画面振動を発生させる。
@@ -164,6 +166,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 - `ScreenToWorld(screenX, screenY)` / `WorldToScreen(worldX, worldY)`: 座標相互変換。
 - `VisibleBounds()`: 現在カメラ内に見えているワールド領域 `(minX, minY, maxX, maxY)` を取得。
 - `Render(screen, drawFunc)`: カメラのトランスフォーム・ビューポート・シェーダーを適用して描画クロージャを実行。
+
 
 ### `camera.Group`
 - `NewGroup(cameras...)`: 複数カメラを管理するグループを作成。

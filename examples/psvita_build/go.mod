@@ -1,4 +1,4 @@
-module ebiten/examples/psvita
+module ebiten/examples/psvita_build
 
 go 1.26.5
 
