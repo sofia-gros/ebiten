@@ -102,4 +102,7 @@ A fully independent library providing automatic Tiled Map Editor (`.json` / `.tm
 
 ## License
 
+
+
+
 MIT License
