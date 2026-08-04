@@ -29,11 +29,11 @@ go.work.sum
 
 # Editor/IDE
 # .idea/
-# .vscode/
+.vscode
+
 examples/psvita_build/.binaryen_linux
 examples/psvita_build/.go_linux
 examples/psvita_build/.tinygo_linux
 examples/psvita_build/.go_linux
 examples/psvita_build/.vitasdk_linux
 examples/psvita_build/.wabt_linux
-

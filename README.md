@@ -7,18 +7,20 @@ Ebitengine (ebiten) をより強力かつ直感的に扱うためのゲーム開
 
 ## 提供コンポーネント
 
-| コンポーネント                     | 役割                                                  | 状態                |
-| :--------------------------------- | :---------------------------------------------------- | :------------------ |
-| [**pad**](./pad/README.md)         | アクションベースの入力抽象化＆バーチャルパッド UI     | **Stable (v1.1.0)** |
-| [**scene**](./scene/README.md)     | シーン管理・スタックベースのオーバーレイ制御          | **Stable (v1.0.0)** |
-| [**physics**](./physics/README.md) | Arcade/Box2D のバックエンド切り替え式 2D 物理エンジン | **Stable (v1.0.1)** |
-| [**emit**](./emit/README.md)       | 軽量かつ型安全なイベントディスパッチャー／エミッター | **Stable (v1.0.0)** |
-| [**asset**](./asset/README.md)     | 画像・音声・データ・マップ等の一元管理マネージャー   | **Stable (v1.0.0)** |
-| [**sound**](./sound/README.md)     | サウンド・BGM/SE/ボイス・2D音源制御マネージャー       | **Stable (v1.0.0)** |
-| [**save**](./save/README.md)       | フラット保存・暗号化・自動穴埋めスロットマネージャー | **Stable (v1.0.0)** |
-| [**camera**](./camera/README.md)   | 2Dカメラ・マルチカメラ・ビューポート・シェーダー制御  | **Stable (v1.0.0)** |
-| [**tween**](./tween/README.md)     | イージング＆動的コントロール・グループアニメーション  | **Stable (v1.0.0)** |
-| [**ui**](./ui/README.md)           | ゲームUI・9スライス・状態別画像ボタン・レイアウト     | **Stable (v1.0.0)** |
+| コンポーネント                         | 役割                                                              | 状態                |
+| :------------------------------------- | :---------------------------------------------------------------- | :------------------ |
+| [**pad**](./pad/README.md)             | アクションベースの入力抽象化＆バーチャルパッド UI                 | **Stable (v1.1.0)** |
+| [**scene**](./scene/README.md)         | シーン管理・スタックベースのオーバーレイ制御                      | **Stable (v1.0.0)** |
+| [**physics**](./physics/README.md)     | Arcade/Box2D のバックエンド切り替え式 2D 物理エンジン             | **Stable (v1.0.1)** |
+| [**emit**](./emit/README.md)           | 軽量かつ型安全なイベントディスパッチャー／エミッター              | **Stable (v1.0.0)** |
+| [**asset**](./asset/README.md)         | 画像・音声・データ・マップ等の一元管理マネージャー                | **Stable (v1.0.0)** |
+| [**sound**](./sound/README.md)         | サウンド・BGM/SE/ボイス・2D音源制御マネージャー                   | **Stable (v1.0.0)** |
+| [**save**](./save/README.md)           | フラット保存・暗号化・自動穴埋めスロットマネージャー              | **Stable (v1.0.0)** |
+| [**camera**](./camera/README.md)       | 2Dカメラ・マルチカメラ・ビューポート・シェーダー制御              | **Stable (v1.0.0)** |
+| [**tween**](./tween/README.md)         | イージング＆動的コントロール・グループアニメーション              | **Stable (v1.0.0)** |
+| [**ui**](./ui/README.md)               | ゲームUI・9スライス・状態別画像ボタン・レイアウト                 | **Stable (v1.0.0)** |
+| [**animation**](./animation/README.md) | スプライトアニメーション再生機・汎用JSON(Aseprite等)全自動読込    | **Stable (v1.0.0)** |
+| [**tilemap**](./tilemap/README.md)     | Tiled JSON自動インポート・カリング描画・3種マップ構成・範囲クエリ | **Stable (v1.0.0)** |
 
 ---
 
@@ -84,12 +86,17 @@ Ebitengine 向けの軽量・高機能な 2D カメラライブラリです。�
 
 [詳しくはこちら](./ui/README.md)
 
+### animation (スプライトアニメーション)
 
+直感的な 2D スプライトアニメーション制御ライブラリです。手動でのコマ定義に加えて、Aseprite や TexturePacker などの汎用 JSON 形式からの全自動アニメーション構築に対応しています。`Manager` による一括制御/スローモーション演出と、各 `Animator` 単体での個別制御を両立しています。
 
+[詳しくはこちら](./animation/README.md)
 
+### tilemap (2Dタイルマップマネージャー)
 
+Tiled Map Editor (`.json` / `.tmj`) の全自動インポート、2次元配列からのコード直接生成、3種類のタイルマップ構成 (`StaticTilemap`, `AnimatedTilemap`, `InfiniteTilemap`)、視域カリング描画 (`DrawRegion`)、範囲指定クエリ (`GetArea`)、物理 AABB 結合矩形算出 (`CreateCollisionBoxes`) を提供する完全独立ライブラリです。
 
-
+[詳しくはこちら](./tilemap/README.md)
 
 ---
 
